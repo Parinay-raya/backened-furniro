@@ -5,14 +5,14 @@ const cors = require('cors');
 const app = express();
 
 // Middleware
-app.use(cors());  // Enable CORS for all routes
-app.use(express.json());  // To parse JSON request bodies
+app.use(cors()); // Enable CORS for all routes
+app.use(express.json()); // To parse JSON request bodies
 
 // MongoDB URI
-const mongoURI = 'mongodb+srv://parinayraya7432:Parinay6106@mydatabase.wfqj7.mongodb.net/';
+const mongoURI = process.env.MONGO_URI || 'mongodb+srv://parinayraya7432:Parinay6106@mydatabase.wfqj7.mongodb.net/';
 
 // Connect to MongoDB Atlas
-mongoose.connect(mongoURI)
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB Atlas'))
     .catch(err => console.error('Failed to connect to MongoDB Atlas:', err));
 
@@ -21,7 +21,7 @@ const productSchema = new mongoose.Schema({
   name: String,
   description: String,
   price: Number,
-  imageUrl: String
+  imageUrl: String,
 });
 
 // Create Product model
@@ -50,18 +50,14 @@ app.get('/api/products', async (req, res) => {
       products,
       total: totalProducts,
       totalPages,
-      currentPage: page
-    }); 
-    console.log("products", products   )
-    
+      currentPage: page,
+    });
+    console.log('Products:', products);
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Error fetching products', error: error.message });
   }
 });
-
-// Serve static files
-app.use(express.static('public')); // Make sure static files like index.html are served AFTER the API routes
 
 // Start the server on the given PORT or default to 5000
 const PORT = process.env.PORT || 5000;
